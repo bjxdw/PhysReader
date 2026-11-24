@@ -1,7 +1,304 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>What a Drop Reveals</title>
-<style>body{margin:0;background:#fff;color:#1b1f24;font-family:'Times New Roman',Times,serif}
-h1{max-width:1100px;margin:80px auto 0;padding:0 16px;font-size:32px;line-height:1.25;text-align:center;font-weight:700}
-@media (max-width:640px){h1{font-size:25px}}</style></head>
-<body><h1>What a Drop Reveals: Sim-to-Real Material Estimation for Deformable Objects from Video</h1></body></html>
+<title>What a Drop Reveals</title><meta name="description" content="How an object deforms when it hits the ground reveals what it is made of."><meta property="og:title" content="What a Drop Reveals: Sim-to-Real Material Estimation for Deformable Objects from Video"><meta property="og:description" content="How an object deforms when it hits the ground reveals what it is made of."><meta property="og:image" content="https://bjxdw.github.io/PhysReader/web_media/overview.jpg"><meta property="og:url" content="https://bjxdw.github.io/PhysReader/"><style>
+@font-face{font-family:'Termes';src:url('web_media/fonts/texgyretermes-regular.otf');font-weight:400;font-style:normal}
+@font-face{font-family:'Termes';src:url('web_media/fonts/texgyretermes-italic.otf');font-weight:400;font-style:italic}
+@font-face{font-family:'Termes';src:url('web_media/fonts/texgyretermes-bold.otf');font-weight:700;font-style:normal}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:#fff;color:#1b1f24;font-family:'Times New Roman',Termes,Times,serif;font-size:18px;line-height:1.55}
+.col{max-width:1100px;margin:0 auto;padding:0 16px}
+a{color:#1772d0;text-decoration:none} a:hover{text-decoration:underline}
+h1{font-size:32px;line-height:1.25;text-align:center;font-weight:700;margin:56px 0 12px}
+.authors{text-align:center;color:#444;margin-bottom:34px;font-size:19px}
+h3{font-size:24px;font-weight:400;text-align:center;margin:64px 0 18px}
+p{text-align:justify;hyphens:auto;margin:0 0 14px}
+video,img,canvas{display:block;max-width:100%}
+.full{width:100%;height:auto}
+.cap{font-size:16px;text-align:justify;margin-top:10px;color:#333}
+.lbl{color:#666}
+button.t{font:inherit;font-size:16px;background:none;border:0;padding:2px 6px;color:#1772d0;cursor:pointer}
+button.t[aria-pressed=true]{color:#1b1f24;font-weight:700;text-decoration:underline}
+.ctl{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 22px;margin:8px 0 10px;font-size:16px}
+.objects{display:flex;flex-wrap:nowrap;gap:2px;overflow-x:auto;justify-content:safe center;padding:2px 0 6px}
+.obj{flex:0 0 auto;width:60px;background:none;border:0;padding:2px;cursor:pointer;font:inherit;font-size:12px;line-height:1.1;color:#555;opacity:.55}
+.obj img{width:54px;height:54px;object-fit:cover;margin:0 auto 2px}
+.obj[aria-pressed=true]{opacity:1;color:#1b1f24;font-weight:700}
+.grid{display:grid;gap:0}
+.cell{position:relative;aspect-ratio:4/5;background:#f4f5f6}
+.cell video,.cell canvas{width:100%;height:100%;object-fit:cover}
+.cell canvas{touch-action:none;cursor:grab}
+#g3d{display:none}
+.labels{display:grid;text-align:center;font-size:15px;line-height:1.35;margin-top:6px}
+.labels .t{font-size:16px}
+.labels .par{color:#555;font-size:14px}
+.bar{display:none;align-items:center;justify-content:center;gap:8px;font-size:14px;color:#555;margin-top:6px}
+.bar .grad{width:200px;height:10px}
+.hint{display:none;text-align:center;font-size:14px;color:#555;margin-top:2px}
+.plot{position:relative}
+.plot svg{width:100%;height:auto}
+.tip{position:absolute;pointer-events:none;background:#fff;border:1px solid #ccc;padding:3px 7px;font-size:14px;line-height:1.35;display:none;white-space:nowrap}
+ul.find{margin:0;padding-left:22px} ul.find li{margin:0 0 12px;text-align:justify}
+footer{margin:70px 0 50px;color:#777;font-size:14px;text-align:center}
+@media (max-width:640px){body{font-size:16px}h1{font-size:25px}h3{font-size:21px}.labels{font-size:11px}.labels .t{font-size:12px}.labels .par{font-size:10px}}
+
+.authors a,.affils a{color:#1772d0}
+.authors{margin-bottom:6px;line-height:1.7}
+.authors .au{display:inline-block;margin:0 10px;white-space:nowrap}
+.affils{text-align:center;color:#555;font-size:17px;margin-bottom:18px}
+.affils span{display:inline-block;margin:0 10px;white-space:nowrap}
+.links{text-align:center;margin:0 0 30px}
+.links a{display:inline-block;margin:4px 6px;padding:6px 18px;border-radius:20px;background:#1b1f24;color:#fff;font-size:17px}
+.links a:hover{background:#3a414a;text-decoration:none}
+pre.bib{background:#f4f5f6;padding:12px 14px;font-size:14px;line-height:1.4;overflow-x:auto;white-space:pre}
+</style></head>
+<body><div class="col">
+<h1>What a Drop Reveals: Sim-to-Real Material Estimation for Deformable Objects from Video</h1>
+<div class="authors"><span class="au"><a href="https://bjxdw.github.io/">Ziyue Peng</a><sup>1</sup></span><span class="au"><a href="https://bjxdw.github.io/PhysReader/">Yanxi Hu</a><sup>2</sup></span><span class="au"><a href="https://bjxdw.github.io/PhysReader/">Junyoung Kim</a><sup>1</sup></span><span class="au"><a href="https://bjxdw.github.io/PhysReader/">Andrew Chen</a><sup>3</sup></span><span class="au"><a href="https://sites.utexas.edu/yang/">Jin Yang</a><sup>1</sup></span><span class="au"><a href="https://www.cs.utexas.edu/~bajaj/cvc/">Chandrajit L. Bajaj</a><sup>1</sup></span><span class="au"><a href="https://www.cs.utexas.edu/~evouga/">Etienne Vouga</a><sup>1</sup></span><span class="au"><a href="https://billf.mit.edu/">William T. Freeman</a><sup>4</sup></span><span class="au"><a href="https://www.cs.utexas.edu/~huangqx/">Qixing Huang</a><sup>1</sup></span><span class="au"><a href="https://brandonyfeng.github.io/">Brandon Y. Feng</a><sup>4</sup></span></div>
+<div class="affils"><span><sup>1</sup><a href="https://www.utexas.edu/">University of Texas at Austin</a></span><span><sup>2</sup><a href="https://www.zju.edu.cn/">Zhejiang University</a></span><span><sup>3</sup><a href="https://roundrockisd.org/">Westwood High School</a></span><span><sup>4</sup><a href="https://www.mit.edu/">Massachusetts Institute of Technology</a></span></div>
+<div class="links"><a href="paper.pdf">Paper</a><a href="video.mp4">Video</a></div>
+<video class="full" src="video.mp4" controls preload="metadata" poster="web_media/video_poster.jpg"></video>
+
+<h3>Abstract</h3>
+<p>How an object deforms when it hits the ground reveals what it is made of.
+From a single real video of a drop, we estimate a deformable object&rsquo;s density-normalized stiffness <i>E</i>/<i>&rho;</i>, and its yield stress <i>&sigma;</i><sub><i>Y</i></sub>/<i>&rho;</i> when the impact causes plastic deformation, with a feed-forward predictor trained only in simulation.
+Real videos carry no material labels, so such predictors are developed and validated on synthetic data alone.
+We show that synthetic validation ranks their geometric inputs in the wrong order.
+Material acts through 3D deformation, and tracklets lifted to 3D with estimated depth are indeed the most accurate input in simulation.
+However, on real drops they are the least accurate, and better depth does not repair them: the failure persists with simulator depth in training, LiDAR depth at test time, and exact depth on rendered replays of the real drops.
+Short 2D optical-flow tracklets do the opposite: they improve nothing in simulation, yet they transfer best.
+Material is therefore better read from what perception measures consistently in both domains than from what is most informative in simulation.
+Our predictor, PhysReader, reads the video and 2D tracklets and learns the lift to 3D in simulation by matching a teacher that sees exact 3D deformation.
+To measure transfer, we introduce PhysReader-Real: 16 everyday objects dropped five times each, with reference materials fit jointly to each object&rsquo;s drops and checked against tensile tests.
+On PhysReader-Real, PhysReader is closer to the reference materials than every other input and baseline. The one exception is a per-scene optimizer started from PhysReader&rsquo;s prediction, which ends slightly closer but takes 49 minutes per video instead of 12&nbsp;seconds.</p>
+
+<h3>Overview</h3>
+<video class="full" src="web_media/overview.mp4" poster="web_media/overview.jpg" autoplay loop muted playsinline></video>
+<p class="cap"><b>What a drop reveals, and what transfers.</b>
+A predictor trained only in simulation estimates an object&rsquo;s material from a video of its drop. Should it read 2D optical-flow tracklets (blue) or the same tracklets lifted to 3D with estimated depth (orange)? Lifting lowers the error slightly in simulation (left) but raises it sharply on real drops (right). Observed video: the drop at impact (earlier and later frames translucent), the 2D tracklets, and the 3D tracklets, rotated to show depth. Re-simulation: the drop re-simulated from the same initial state with the true material (simulation) or a reference material fit to the object&rsquo;s drops (real), and with the materials predicted by PhysReader trained on 2D tracklets and by the same model trained on 3D tracklets. Color shows strain at impact (scales differ), and log E is log<sub>10</sub> of Young&rsquo;s modulus in Pa. Both predictions are close to the truth in simulation, but on the real drop the 3D one is far too soft. Error: averaged over all validation clips and real drops, in dex (log<sub>10</sub> units); real drops are scored by their distance to the plausible region, the materials that reproduce the object&rsquo;s drops. The 3D tracklets look noisier on the real drop, but even better depth does not close the gap (Sec.&nbsp;5.3).</p>
+
+<h3>Method</h3>
+<video class="full" src="web_media/method.mp4" poster="web_media/method.jpg" autoplay loop muted playsinline></video>
+<p class="cap"><b>Overview of PhysReader.</b>
+<i>Training in simulation (left):</i> &#x2776;&nbsp;a teacher encodes exact 3D deformation, available only in simulation, into a feature <b><i>f</i></b><sub><i>T</i></sub>, from which material heads predict <i>E</i>/<i>&rho;</i> and <i>&sigma;</i><sub><i>Y</i></sub>/<i>&rho;</i> (loss <i>&ell;</i> against the GT material).
+&#x2777;&nbsp;PhysReader sees only inputs that real video also provides: the RGB clip (V-JEPA&nbsp;2 with LoRA), 2D optical-flow tracklets, and temporal and scale context.
+It maps them to <b><i>f&#770;</i></b><sub><i>T</i></sub> and is trained to match <b><i>f</i></b><sub><i>T</i></sub> (loss <i>d</i>) and the material through a frozen copy of the teacher&rsquo;s heads (<i>&ell;</i>; Eq.&nbsp;4).
+<i>Inference in real (right):</i> PhysReader alone predicts the material, without depth.
+For evaluation, the prediction re-simulates the drop with density <i>&rho;</i> and Poisson&rsquo;s ratio <i>&nu;</i>, and we report the replay loss and the parameter distance to the plausible region of reference materials&nbsp;(Sec.&nbsp;4).</p>
+
+<h3>Benchmark: PhysReader-Real</h3>
+<video class="full" src="web_media/bench.mp4" poster="web_media/bench.jpg" autoplay loop muted playsinline></video>
+<img class="full" src="web_media/benchmark.jpg" alt="Figure 3 of the paper" style="margin-top:14px">
+<p class="cap"><b>PhysReader-Real.</b> Top: the 16 objects; each clip cycles through the object's five drops. Bottom (Fig.&nbsp;3 of the paper): the 16 objects, and for the 8 objects we cut specimens from, the reference stiffness fit jointly to the five drops (dot) and its plausible region (blue) against the measured stiffness of tensile specimens&nbsp;(gray).</p>
+
+<h3>Qualitative results</h3>
+<p>Each real drop is re-simulated from the moment of release with three materials: the reference material fit to the object's five drops, the material predicted by PhysReader, and the material predicted by the same model trained on 3D tracklets. We show one drop of each&nbsp;object.</p>
+<div class="objects" role="group" aria-label="Object"><button class="obj qobj" data-i="0" aria-pressed="false"><img src="web_media/objects/belt.jpg" alt="">belt</button><button class="obj qobj" data-i="1" aria-pressed="false"><img src="web_media/objects/bottle.jpg" alt="">bottle</button><button class="obj qobj" data-i="2" aria-pressed="false"><img src="web_media/objects/bowl.jpg" alt="">bowl</button><button class="obj qobj" data-i="3" aria-pressed="false"><img src="web_media/objects/box.jpg" alt="">box</button><button class="obj qobj" data-i="4" aria-pressed="false"><img src="web_media/objects/crocs.jpg" alt="">crocs</button><button class="obj qobj" data-i="5" aria-pressed="false"><img src="web_media/objects/diaper.jpg" alt="">diaper</button><button class="obj qobj" data-i="6" aria-pressed="false"><img src="web_media/objects/glove.jpg" alt="">glove</button><button class="obj qobj" data-i="7" aria-pressed="false"><img src="web_media/objects/hanger.jpg" alt="">hanger</button><button class="obj qobj" data-i="8" aria-pressed="false"><img src="web_media/objects/kitty.jpg" alt="">kitty</button><button class="obj qobj" data-i="9" aria-pressed="false"><img src="web_media/objects/medkit.jpg" alt="">medkit</button><button class="obj qobj" data-i="10" aria-pressed="false"><img src="web_media/objects/napkin.jpg" alt="">napkin</button><button class="obj qobj" data-i="11" aria-pressed="false"><img src="web_media/objects/neck_pillow.jpg" alt="">neck pillow</button><button class="obj qobj" data-i="12" aria-pressed="false"><img src="web_media/objects/pad.jpg" alt="">pad</button><button class="obj qobj" data-i="13" aria-pressed="false"><img src="web_media/objects/pillow.jpg" alt="">pillow</button><button class="obj qobj" data-i="14" aria-pressed="false"><img src="web_media/objects/sneaker.jpg" alt="">sneaker</button><button class="obj qobj" data-i="15" aria-pressed="false"><img src="web_media/objects/trash_bin.jpg" alt="">trash bin</button></div>
+<div class="ctl">
+ <span><span class="lbl">Speed</span> <button class="t" data-rate="1">1&times;</button><button class="t" data-rate="0.5">0.5&times;</button><button class="t" data-rate="0.25">0.25&times;</button></span>
+ <span><span class="lbl">Show</span> <button class="t" data-mode="appearance">appearance</button><button class="t" data-mode="strain">strain</button></span>
+ <span><span class="lbl">View</span> <button class="t" data-view="2d">2D</button><button class="t" data-view="3d">3D</button><button class="t" id="reset" style="display:none">reset view</button></span>
+</div>
+<video id="v2d" class="full" muted loop playsinline autoplay preload="auto" width="1920" height="600"></video>
+<div id="g3d" class="grid" style="grid-template-columns:repeat(4,1fr)"><div class="cell"><video id="vreal" muted loop playsinline preload="auto"></video></div><div class="cell"><canvas></canvas></div><div class="cell"><canvas></canvas></div><div class="cell"><canvas></canvas></div></div>
+<div id="labels" class="labels" style="grid-template-columns:repeat(4,1fr)"></div>
+<div id="bar" class="bar">strain&nbsp;0 <div class="grad" style="background:linear-gradient(90deg,rgb(30,203,218) 0%,rgb(32,234,172) 10%,rgb(89,251,115) 20%,rgb(156,254,64) 30%,rgb(203,237,52) 40%,rgb(239,205,58) 50%,rgb(254,164,49) 60%,rgb(247,111,26) 70%,rgb(225,65,9) 80%,rgb(188,32,2) 90%,rgb(136,8,2) 100%)"></div> 0.12</div>
+<div id="hint" class="hint">The deforming meshes of the three re-simulations. Drag to rotate, scroll or pinch to zoom, double-click to reset.</div>
+<p class="cap">Before the release the object is shown held still. Strain is the magnitude of the Hencky strain, as in the overview figure. All three re-simulations of a drop use the same simulator, density, and Poisson's ratio; their initial states are fit to the video for each material. Yield stress is shown for drops that&nbsp;yield.</p>
+
+<h3>Quantitative results: Which inputs transfer</h3>
+<p>Each point is one predictor: its stiffness error (log<sub>10</sub>&thinsp;<i>E</i>/<i>&rho;</i>, dex) on synthetic validation and on the 80 real drops. Left is better in simulation, and lower is better on real drops. Arrows go from a model on 2D tracklets to the same model on 3D tracklets, and every arrow points to the upper left: tracklets lifted to 3D with estimated depth are the most accurate input in simulation, but on real drops they are the least accurate. Better depth does not repair them: with the simulator&rsquo;s rendered depth in training, or with LiDAR depth or depth rendered from re-simulations of the real scenes at inference, the real error stays high. The rings, shown with the checkbox, are models on 3D tracklets with such other training or test&nbsp;depth.</p>
+<div class="ctl"><label class="lbl" style="cursor:pointer"><input type="checkbox" id="f4rings"> show the 3D-tracklet models with other training or test depth</label></div>
+<div class="plot" id="f4wrap"><div id="f4plot"></div><div class="tip" id="f4tip"></div></div>
+
+<h3>Quantitative results: Comparison with prior methods</h3>
+<p>Parameter distance to the plausible region on the 80 real drops against the time per video. Left is faster, and lower is more accurate. PhysReader takes about 12 seconds per video and is closer to the reference materials than any other baseline: the other feed-forward predictors, the per-scene optimizers with their own initialization, the VLM, and the coding agent are all less accurate. The one exception is a per-scene optimizer, PhysFlow, started from PhysReader&rsquo;s prediction: it ends about 1% better, but takes 49 minutes per video instead of 12 seconds, about 250 times&nbsp;longer.</p>
+<div class="plot" id="t5wrap"><div id="t5plot"></div><div class="tip" id="t5tip"></div></div>
+
+<h3>Findings</h3>
+<ul class="find"><li>In simulation, the best input is the one with the most 3D information. On real drops, sim-to-real transferability also matters. It is a trade-off between informativeness and transferability: the best input should transfer well while still having enough geometric&nbsp;information.</li><li>Estimated 2D tracklets transfer to real drops. Lifted 3D tracklets do not, and better depth does not fix&nbsp;this.</li><li>Physics happens in 3D, and we can still use 3D deformation. PhysReader keeps the 2D tracklets as input and learns the lift to 3D in simulation, by matching a teacher that sees the exact 3D&nbsp;deformation.</li><li>To choose an input, do not test it on synthetic data, but on real drops or re-simulated real&nbsp;scenes.</li></ul>
+<footer></footer>
+</div>
+<script>window.QDEFAULT=2;window.QUAL=[{"name": "belt_2", "object": "belt", "drop": 2, "title": "belt", "yielded": false, "sims": {"reference": {"E": "1.1&thinsp;&times;&thinsp;10<sup>5</sup>&nbsp;Pa", "Y": "3.3&thinsp;&times;&thinsp;10<sup>5</sup>&nbsp;Pa"}, "physreader": {"E": "1.0&thinsp;&times;&thinsp;10<sup>5</sup>&nbsp;Pa", "Y": "9.3&thinsp;&times;&thinsp;10<sup>4</sup>&nbsp;Pa"}, "student3d": {"E": "1.4&thinsp;&times;&thinsp;10<sup>4</sup>&nbsp;Pa", "Y": "6.3&thinsp;&times;&thinsp;10<sup>4</sup>&nbsp;Pa"}}}, {"name": "bottle_5", "object": "bottle", "drop": 5, "title": "bottle", "yielded": true, "sims": {"reference": {"E": "2.8&thinsp;&times;&thinsp;10<sup>8</sup>&nbsp;Pa", "Y": "1.4&thinsp;&times;&thinsp;10<sup>6</sup>&nbsp;Pa"}, "physreader": {"E": "1.1&thinsp;&times;&thinsp;10<sup>8</sup>&nbsp;Pa", "Y": "5.5&thinsp;&times;&thinsp;10<sup>5</sup>&nbsp;Pa"}, "student3d": {"E": "7.9&thinsp;&times;&thinsp;10<sup>5</sup>&nbsp;Pa", "Y": "2.6&thinsp;&times;&thinsp;10<sup>5</sup>&nbsp;Pa"}}}, {"name": "bowl_3", "object": "bowl", "drop": 3, "title": "bowl", "yielded": true, "sims": {"reference": {"E": "4.6&thinsp;&times;&thinsp;10<sup>8</sup>&nbsp;Pa", "Y": "8.4&thinsp;&times;&thinsp;10<sup>5</sup>&nbsp;Pa"}, "physreader": {"E": "1.5&thinsp;&times;&thinsp;10<sup>8</sup>&nbsp;Pa", "Y": "4.9&thinsp;&times;&thinsp;10<sup>5</sup>&nbsp;Pa"}, "student3d": {"E": "1.1&thinsp;&times;&thinsp;10<sup>6</sup>&nbsp;Pa", "Y": "1.2&thinsp;&times;&thinsp;10<sup>5</sup>&nbsp;Pa"}}}, {"name": "box_1", "object": "box", "drop": 1, "title": "box", "yielded": true, "sims": {"reference": {"E": "7.8&thinsp;&times;&thinsp;10<sup>8</sup>&nbsp;Pa", "Y": "1.3&thinsp;&times;&thinsp;10<sup>6</sup>&nbsp;Pa"}, "physreader": {"E": "4.9&thinsp;&times;&thinsp;10<sup>7</sup>&nbsp;Pa", "Y": "6.4&thinsp;&times;&thinsp;10<sup>5</sup>&nbsp;Pa"}, "student3d": {"E": "9.5&thinsp;&times;&thinsp;10<sup>6</sup>&nbsp;Pa", "Y": "1.5&thinsp;&times;&thinsp;10<sup>5</sup>&nbsp;Pa"}}}, {"name": "crocs_4", "object": "crocs", "drop": 4, "title": "crocs", "yielded": true, "sims": {"reference": {"E": "1.2&thinsp;&times;&thinsp;10<sup>6</sup>&nbsp;Pa", "Y": "1.0&thinsp;&times;&thinsp;10<sup>5</sup>&nbsp;Pa"}, "physreader": {"E": "4.4&thinsp;&times;&thinsp;10<sup>6</sup>&nbsp;Pa", "Y": "3.6&thinsp;&times;&thinsp;10<sup>5</sup>&nbsp;Pa"}, "student3d": {"E": "2.2&thinsp;&times;&thinsp;10<sup>5</sup>&nbsp;Pa", "Y": "7.6&thinsp;&times;&thinsp;10<sup>4</sup>&nbsp;Pa"}}}, {"name": "diaper_5", "object": "diaper", "drop": 5, "title": "diaper", "yielded": true, "sims": {"reference": {"E": "1.0&thinsp;&times;&thinsp;10<sup>6</sup>&nbsp;Pa", "Y": "1.0&thinsp;&times;&thinsp;10<sup>5</sup>&nbsp;Pa"}, "physreader": {"E": "9.7&thinsp;&times;&thinsp;10<sup>5</sup>&nbsp;Pa", "Y": "9.1&thinsp;&times;&thinsp;10<sup>4</sup>&nbsp;Pa"}, "student3d": {"E": "4.3&thinsp;&times;&thinsp;10<sup>4</sup>&nbsp;Pa", "Y": "2.5&thinsp;&times;&thinsp;10<sup>4</sup>&nbsp;Pa"}}}, {"name": "glove_1", "object": "glove", "drop": 1, "title": "glove", "yielded": false, "sims": {"reference": {"E": "1.0&thinsp;&times;&thinsp;10<sup>4</sup>&nbsp;Pa", "Y": "7.9&thinsp;&times;&thinsp;10<sup>6</sup>&nbsp;Pa"}, "physreader": {"E": "8.4&thinsp;&times;&thinsp;10<sup>4</sup>&nbsp;Pa", "Y": "8.4&thinsp;&times;&thinsp;10<sup>4</sup>&nbsp;Pa"}, "student3d": {"E": "4.8&thinsp;&times;&thinsp;10<sup>4</sup>&nbsp;Pa", "Y": "9.0&thinsp;&times;&thinsp;10<sup>4</sup>&nbsp;Pa"}}}, {"name": "hanger_1", "object": "hanger", "drop": 1, "title": "hanger", "yielded": true, "sims": {"reference": {"E": "8.1&thinsp;&times;&thinsp;10<sup>8</sup>&nbsp;Pa", "Y": "1.0&thinsp;&times;&thinsp;10<sup>5</sup>&nbsp;Pa"}, "physreader": {"E": "1.2&thinsp;&times;&thinsp;10<sup>8</sup>&nbsp;Pa", "Y": "8.9&thinsp;&times;&thinsp;10<sup>5</sup>&nbsp;Pa"}, "student3d": {"E": "3.1&thinsp;&times;&thinsp;10<sup>6</sup>&nbsp;Pa", "Y": "2.9&thinsp;&times;&thinsp;10<sup>5</sup>&nbsp;Pa"}}}, {"name": "kitty_2", "object": "kitty", "drop": 2, "title": "kitty", "yielded": false, "sims": {"reference": {"E": "1.0&thinsp;&times;&thinsp;10<sup>4</sup>&nbsp;Pa", "Y": "2.0&thinsp;&times;&thinsp;10<sup>6</sup>&nbsp;Pa"}, "physreader": {"E": "1.0&thinsp;&times;&thinsp;10<sup>4</sup>&nbsp;Pa", "Y": "1.2&thinsp;&times;&thinsp;10<sup>4</sup>&nbsp;Pa"}, "student3d": {"E": "6.9&thinsp;&times;&thinsp;10<sup>3</sup>&nbsp;Pa", "Y": "1.1&thinsp;&times;&thinsp;10<sup>4</sup>&nbsp;Pa"}}}, {"name": "medkit_5", "object": "medkit", "drop": 5, "title": "medkit", "yielded": true, "sims": {"reference": {"E": "1.6&thinsp;&times;&thinsp;10<sup>7</sup>&nbsp;Pa", "Y": "1.3&thinsp;&times;&thinsp;10<sup>5</sup>&nbsp;Pa"}, "physreader": {"E": "4.0&thinsp;&times;&thinsp;10<sup>6</sup>&nbsp;Pa", "Y": "1.4&thinsp;&times;&thinsp;10<sup>5</sup>&nbsp;Pa"}, "student3d": {"E": "3.5&thinsp;&times;&thinsp;10<sup>5</sup>&nbsp;Pa", "Y": "9.2&thinsp;&times;&thinsp;10<sup>4</sup>&nbsp;Pa"}}}, {"name": "napkin_5", "object": "napkin", "drop": 5, "title": "napkin", "yielded": true, "sims": {"reference": {"E": "4.3&thinsp;&times;&thinsp;10<sup>6</sup>&nbsp;Pa", "Y": "2.6&thinsp;&times;&thinsp;10<sup>5</sup>&nbsp;Pa"}, "physreader": {"E": "4.6&thinsp;&times;&thinsp;10<sup>5</sup>&nbsp;Pa", "Y": "1.4&thinsp;&times;&thinsp;10<sup>5</sup>&nbsp;Pa"}, "student3d": {"E": "3.9&thinsp;&times;&thinsp;10<sup>4</sup>&nbsp;Pa", "Y": "5.0&thinsp;&times;&thinsp;10<sup>4</sup>&nbsp;Pa"}}}, {"name": "neck_pillow_5", "object": "neck_pillow", "drop": 5, "title": "neck pillow", "yielded": false, "sims": {"reference": {"E": "1.0&thinsp;&times;&thinsp;10<sup>4</sup>&nbsp;Pa", "Y": "1.0&thinsp;&times;&thinsp;10<sup>5</sup>&nbsp;Pa"}, "physreader": {"E": "1.0&thinsp;&times;&thinsp;10<sup>4</sup>&nbsp;Pa", "Y": "1.3&thinsp;&times;&thinsp;10<sup>4</sup>&nbsp;Pa"}, "student3d": {"E": "2.2&thinsp;&times;&thinsp;10<sup>3</sup>&nbsp;Pa", "Y": "8.9&thinsp;&times;&thinsp;10<sup>3</sup>&nbsp;Pa"}}}, {"name": "pad_3", "object": "pad", "drop": 3, "title": "pad", "yielded": false, "sims": {"reference": {"E": "1.0&thinsp;&times;&thinsp;10<sup>4</sup>&nbsp;Pa", "Y": "2.0&thinsp;&times;&thinsp;10<sup>7</sup>&nbsp;Pa"}, "physreader": {"E": "1.4&thinsp;&times;&thinsp;10<sup>4</sup>&nbsp;Pa", "Y": "4.3&thinsp;&times;&thinsp;10<sup>4</sup>&nbsp;Pa"}, "student3d": {"E": "4.3&thinsp;&times;&thinsp;10<sup>3</sup>&nbsp;Pa", "Y": "3.8&thinsp;&times;&thinsp;10<sup>4</sup>&nbsp;Pa"}}}, {"name": "pillow_3", "object": "pillow", "drop": 3, "title": "pillow", "yielded": false, "sims": {"reference": {"E": "1.0&thinsp;&times;&thinsp;10<sup>4</sup>&nbsp;Pa", "Y": "1.0&thinsp;&times;&thinsp;10<sup>5</sup>&nbsp;Pa"}, "physreader": {"E": "5.2&thinsp;&times;&thinsp;10<sup>4</sup>&nbsp;Pa", "Y": "2.0&thinsp;&times;&thinsp;10<sup>4</sup>&nbsp;Pa"}, "student3d": {"E": "7.7&thinsp;&times;&thinsp;10<sup>3</sup>&nbsp;Pa", "Y": "8.9&thinsp;&times;&thinsp;10<sup>3</sup>&nbsp;Pa"}}}, {"name": "sneaker_1", "object": "sneaker", "drop": 1, "title": "sneaker", "yielded": true, "sims": {"reference": {"E": "1.2&thinsp;&times;&thinsp;10<sup>5</sup>&nbsp;Pa", "Y": "1.0&thinsp;&times;&thinsp;10<sup>5</sup>&nbsp;Pa"}, "physreader": {"E": "1.9&thinsp;&times;&thinsp;10<sup>5</sup>&nbsp;Pa", "Y": "1.4&thinsp;&times;&thinsp;10<sup>5</sup>&nbsp;Pa"}, "student3d": {"E": "2.7&thinsp;&times;&thinsp;10<sup>4</sup>&nbsp;Pa", "Y": "6.4&thinsp;&times;&thinsp;10<sup>4</sup>&nbsp;Pa"}}}, {"name": "trash_bin_3", "object": "trash_bin", "drop": 3, "title": "trash bin", "yielded": true, "sims": {"reference": {"E": "1.0&thinsp;&times;&thinsp;10<sup>8</sup>&nbsp;Pa", "Y": "1.4&thinsp;&times;&thinsp;10<sup>6</sup>&nbsp;Pa"}, "physreader": {"E": "5.3&thinsp;&times;&thinsp;10<sup>7</sup>&nbsp;Pa", "Y": "1.2&thinsp;&times;&thinsp;10<sup>6</sup>&nbsp;Pa"}, "student3d": {"E": "2.7&thinsp;&times;&thinsp;10<sup>6</sup>&nbsp;Pa", "Y": "2.5&thinsp;&times;&thinsp;10<sup>5</sup>&nbsp;Pa"}}}];window.SIMS=[["reference", "Reference"], ["physreader", "PhysReader"], ["student3d", "Student, 3D tracklets"]];window.LUT=[[30, 203, 218], [28, 205, 216], [28, 205, 216], [27, 208, 213], [26, 210, 210], [26, 212, 208], [26, 212, 208], [25, 213, 205], [24, 215, 202], [24, 215, 202], [24, 217, 200], [24, 219, 197], [24, 221, 194], [24, 221, 194], [24, 222, 192], [24, 224, 189], [24, 224, 189], [25, 226, 187], [25, 227, 185], [26, 228, 182], [26, 228, 182], [28, 230, 180], [29, 231, 178], [29, 231, 178], [31, 233, 175], [32, 234, 172], [34, 235, 170], [34, 235, 170], [37, 236, 167], [39, 238, 164], [42, 239, 161], [42, 239, 161], [44, 240, 158], [47, 241, 155], [47, 241, 155], [50, 242, 152], [53, 243, 148], [56, 244, 145], [56, 244, 145], [60, 245, 142], [63, 246, 138], [63, 246, 138], [67, 247, 135], [70, 248, 132], [74, 248, 128], [74, 248, 128], [78, 249, 125], [82, 250, 122], [82, 250, 122], [85, 250, 118], [89, 251, 115], [93, 252, 111], [93, 252, 111], [97, 252, 108], [101, 253, 105], [105, 253, 102], [105, 253, 102], [109, 254, 98], [113, 254, 95], [113, 254, 95], [117, 254, 92], [121, 254, 89], [125, 255, 86], [125, 255, 86], [128, 255, 83], [132, 255, 81], [132, 255, 81], [136, 255, 78], [139, 255, 75], [143, 255, 73], [143, 255, 73], [146, 255, 71], [150, 254, 68], [150, 254, 68], [153, 254, 66], [156, 254, 64], [159, 253, 63], [159, 253, 63], [161, 253, 61], [164, 252, 60], [167, 252, 58], [167, 252, 58], [169, 251, 57], [172, 251, 56], [172, 251, 56], [175, 250, 55], [177, 249, 54], [180, 248, 54], [180, 248, 54], [183, 247, 53], [185, 246, 53], [185, 246, 53], [188, 245, 52], [190, 244, 52], [193, 243, 52], [193, 243, 52], [195, 241, 52], [198, 240, 52], [198, 240, 52], [200, 239, 52], [203, 237, 52], [205, 236, 52], [205, 236, 52], [208, 234, 52], [210, 233, 53], [212, 231, 53], [212, 231, 53], [215, 229, 53], [217, 228, 54], [217, 228, 54], [219, 226, 54], [221, 224, 55], [223, 223, 55], [223, 223, 55], [225, 221, 55], [227, 219, 56], [227, 219, 56], [229, 217, 56], [231, 215, 57], [233, 213, 57], [233, 213, 57], [235, 211, 57], [236, 209, 58], [236, 209, 58], [238, 207, 58], [239, 205, 58], [241, 203, 58], [241, 203, 58], [242, 201, 58], [244, 199, 58], [244, 199, 58], [245, 197, 58], [246, 195, 58], [247, 193, 58], [247, 193, 58], [248, 190, 57], [249, 188, 57], [250, 186, 57], [250, 186, 57], [251, 184, 56], [251, 182, 55], [251, 182, 55], [252, 179, 54], [252, 177, 54], [253, 174, 53], [253, 174, 53], [253, 172, 52], [254, 169, 51], [254, 169, 51], [254, 167, 50], [254, 164, 49], [254, 161, 48], [254, 161, 48], [254, 158, 47], [254, 155, 45], [254, 155, 45], [254, 153, 44], [254, 150, 43], [254, 147, 42], [254, 147, 42], [254, 144, 41], [253, 141, 39], [253, 138, 38], [253, 138, 38], [252, 135, 37], [252, 132, 35], [252, 132, 35], [251, 129, 34], [251, 126, 33], [250, 123, 31], [250, 123, 31], [249, 120, 30], [249, 117, 29], [249, 117, 29], [248, 114, 28], [247, 111, 26], [246, 108, 25], [246, 108, 25], [245, 105, 24], [244, 102, 23], [243, 99, 21], [243, 99, 21], [242, 96, 20], [241, 93, 19], [241, 93, 19], [240, 91, 18], [239, 88, 17], [237, 85, 16], [237, 85, 16], [236, 83, 15], [235, 80, 14], [235, 80, 14], [234, 78, 13], [232, 75, 12], [231, 73, 12], [231, 73, 12], [229, 71, 11], [228, 69, 10], [228, 69, 10], [226, 67, 10], [225, 65, 9], [223, 63, 8], [223, 63, 8], [221, 61, 8], [220, 59, 7], [218, 57, 7], [218, 57, 7], [216, 55, 6], [214, 53, 6], [214, 53, 6], [212, 51, 5], [210, 49, 5], [208, 47, 5], [208, 47, 5], [206, 45, 4], [204, 43, 4], [204, 43, 4], [202, 42, 4], [200, 40, 3], [197, 38, 3], [197, 38, 3], [195, 37, 3], [193, 35, 2], [193, 35, 2], [190, 33, 2], [188, 32, 2], [185, 30, 2], [185, 30, 2], [183, 29, 2], [180, 27, 1], [178, 26, 1], [178, 26, 1], [175, 24, 1], [172, 23, 1], [172, 23, 1], [169, 22, 1], [167, 20, 1], [164, 19, 1], [164, 19, 1], [161, 18, 1], [158, 16, 1], [158, 16, 1], [155, 15, 1], [152, 14, 1], [149, 13, 1], [149, 13, 1], [146, 11, 1], [142, 10, 1], [142, 10, 1], [139, 9, 2], [136, 8, 2], [133, 7, 2], [133, 7, 2], [129, 6, 2], [126, 5, 2], [122, 4, 3]];window.FIG4={"pts": {"rgb": {"short": "RGB", "name": "RGB", "color": "#22272d", "dx": 12, "dy": -10, "anchor": "start", "star": false, "syn": 0.478, "real": 0.8293}, "vid2sim": {"short": "Vid2Sim", "name": "Vid2Sim", "color": "#7b8591", "dx": 12, "dy": 6, "anchor": "start", "star": false, "syn": 0.5561, "real": 0.9681}, "analytic": {"short": "Analytic Dynamics", "name": "Analytic Dynamics", "color": "#7b8591", "dx": -12, "dy": 5, "anchor": "end", "star": false, "syn": 0.6194, "real": 1.0714}, "rgb2d": {"short": "RGB + 2D", "name": "RGB + 2D tracklets", "color": "#2b74c7", "dx": 12, "dy": 12, "anchor": "start", "star": false, "syn": 0.4818, "real": 0.7915}, "stu2d": {"short": "PhysReader", "name": "PhysReader", "color": "#2b74c7", "dx": 14, "dy": 8, "anchor": "start", "star": true, "syn": 0.4808, "real": 0.7307}, "rgb3d": {"short": "RGB + 3D", "name": "RGB + 3D tracklets", "color": "#ea7a1e", "dx": 12, "dy": -10, "anchor": "start", "star": false, "syn": 0.4443, "real": 1.2492}, "stu3d": {"short": "Student, 3D", "name": "Student, 3D tracklets", "color": "#ea7a1e", "dx": 12, "dy": 16, "anchor": "start", "star": false, "syn": 0.4425, "real": 1.2137}, "only2d": {"short": "2D only", "name": "2D tracklets only", "color": "#2b74c7", "dx": 0, "dy": 26, "anchor": "middle", "star": false, "syn": 0.7638, "real": 1.11}, "only3d": {"short": "3D only", "name": "3D tracklets only", "color": "#ea7a1e", "dx": -14, "dy": 5, "anchor": "end", "star": false, "syn": 0.702, "real": 1.4109}, "rgb3d_lidar": {"name": "RGB + 3D tracklets, LiDAR depth at test", "color": "#ea7a1e", "ring": true, "syn": 0.4443, "real": 1.2202}, "da3clip": {"name": "RGB + 3D tracklets, DA3 depth (clip scale)", "color": "#ea7a1e", "ring": true, "syn": 0.4482, "real": 1.302}, "da3frame": {"name": "RGB + 3D tracklets, DA3 depth (frame scale)", "color": "#ea7a1e", "ring": true, "syn": 0.426, "real": 1.267}, "facA": {"name": "Trained on simulator depth and tracks (A)", "color": "#ea7a1e", "ring": true, "syn": 0.4143, "real": 1.3046}, "facB": {"name": "Trained on simulator depth, WAFT tracks (B)", "color": "#ea7a1e", "ring": true, "syn": 0.4215, "real": 1.132}, "facC": {"name": "Trained on 4RC depth, simulator tracks (C)", "color": "#ea7a1e", "ring": true, "syn": 0.4514, "real": 1.1776}, "da3clip_lidar": {"name": "RGB + 3D tracklets, DA3 depth (clip scale), LiDAR depth at test", "color": "#ea7a1e", "ring": true, "syn": 0.4482, "real": 1.269}, "da3frame_lidar": {"name": "RGB + 3D tracklets, DA3 depth (frame scale), LiDAR depth at test", "color": "#ea7a1e", "ring": true, "syn": 0.426, "real": 1.387}, "facA_lidar": {"name": "Trained on simulator depth and tracks (A), LiDAR depth at test", "color": "#ea7a1e", "ring": true, "syn": 0.4143, "real": 1.289}}, "arrows": [["rgb2d", "rgb3d"], ["stu2d", "stu3d"], ["only2d", "only3d"]]};window.TAB5={"pts": [{"label": "PhysDreamer, PhysReader init", "name": "PhysDreamer (PhysReader init)", "dist": 1.203, "minutes": 148.95, "color": "#7b5fb5", "family": "per-scene optimizer", "ours": false}, {"label": "PhysFlow, PhysReader init", "name": "PhysFlow (PhysReader init)", "dist": 0.668, "minutes": 49.36, "color": "#7b5fb5", "family": "per-scene optimizer", "ours": false}, {"label": "PhysFlow, VLM-image init", "name": "PhysFlow (VLM-image init)", "dist": 1.266, "minutes": 34.45, "color": "#7b5fb5", "family": "per-scene optimizer", "ours": false}, {"label": "MonoPhysics, PhysReader init", "name": "MonoPhysics (PhysReader init)", "dist": 0.698, "minutes": 17.44, "color": "#7b5fb5", "family": "per-scene optimizer", "ours": false}, {"label": "MonoPhysics, original init", "name": "MonoPhysics (Original init)", "dist": 1.933, "minutes": 6.66, "color": "#7b5fb5", "family": "per-scene optimizer", "ours": false}, {"label": "Vid2Sim", "name": "Vid2Sim predictor", "dist": 0.96, "minutes": 0.004, "color": "#2a9459", "family": "feed-forward predictor", "ours": false}, {"label": "Analytic Dynamics", "name": "Analytic Dynamics", "dist": 1.084, "minutes": 0.074, "color": "#2a9459", "family": "feed-forward predictor", "ours": false}, {"label": "VLM, image input", "name": "VLM (GPT-6 Astra, image input)", "dist": 1.267, "minutes": 0.196, "color": "#c2477a", "family": "VLM or agent", "ours": false}, {"label": "VLM, video input", "name": "VLM (GPT-6 Astra, video input)", "dist": 1.117, "minutes": 0.199, "color": "#c2477a", "family": "VLM or agent", "ours": false}, {"label": "Agent", "name": "Agent (GPT-6 Astra High)", "dist": 1.131, "minutes": 55.19, "color": "#c2477a", "family": "VLM or agent", "ours": false}, {"label": "PhysReader", "name": "PhysReader", "dist": 0.677, "minutes": 0.2, "color": "#2b74c7", "family": "PhysReader", "ours": true}], "arrows": [["PhysFlow, VLM-image init", "PhysFlow, PhysReader init"], ["MonoPhysics, original init", "MonoPhysics, PhysReader init"]], "families": [["#2a9459", "feed-forward predictor"], ["#7b5fb5", "per-scene optimizer"], ["#c2477a", "VLM or agent"], ["#2b74c7", "PhysReader"]]};</script>
+<script>
+const D=window.QUAL, S=window.SIMS, LUT=window.LUT;
+const st={i:(window.QDEFAULT||0), rate:1, mode:'appearance', view:'2d'};
+const v2d=document.getElementById('v2d'), vreal=document.getElementById('vreal'), g3d=document.getElementById('g3d');
+const canv=[...document.querySelectorAll('#g3d canvas')];
+function pressed(sel, fn){document.querySelectorAll(sel).forEach(b=>b.setAttribute('aria-pressed', fn(b)?'true':'false'));}
+function clock(){return st.view==='2d'?v2d:vreal;}
+function swapSrc(v, src, t){
+  if(v.getAttribute('src')===src){ if(t!=null){try{v.currentTime=t;}catch(e){}} v.playbackRate=st.rate; v.play().catch(()=>{}); return; }
+  v.setAttribute('src', src); v.load();
+  v.addEventListener('loadedmetadata', function once(){ v.removeEventListener('loadedmetadata', once);
+    if(t!=null){try{v.currentTime=Math.min(t, v.duration-0.01);}catch(e){}} v.playbackRate=st.rate; v.play().catch(()=>{}); });
+}
+function labels(){
+  const d=D[st.i]; let h='<div><div class="t">Real video</div><div class="par">'+d.title+'</div></div>';
+  S.forEach((s,k)=>{ const m=d.sims[s[0]]; h+='<div><div class="t" style="color:'+['#1b1f24','#2b74c7','#ea7a1e'][k]+'">'+s[1]+'</div><div class="par"><i>E</i> = '+m.E+(d.yielded?'<br><i>&sigma;</i><sub><i>Y</i></sub> = '+m.Y:'')+'</div></div>'; });
+  document.getElementById('labels').innerHTML=h;
+}
+function show(t0){
+  const d=D[st.i], t=(t0!=null)?t0:(clock().currentTime||0);
+  pressed('.qobj', b=>+b.dataset.i===st.i); pressed('[data-rate]', b=>+b.dataset.rate===st.rate);
+  pressed('[data-mode]', b=>b.dataset.mode===st.mode); pressed('[data-view]', b=>b.dataset.view===st.view);
+  labels();
+  document.getElementById('bar').style.display=st.mode==='strain'?'flex':'none';
+  document.getElementById('hint').style.display=st.view==='3d'?'block':'none';
+  document.getElementById('reset').style.display=st.view==='3d'?'inline-block':'none';
+  if(st.view==='2d'){ g3d.style.display='none'; vreal.pause(); v2d.style.display='block';
+    v2d.setAttribute('poster','web_media/qual/'+d.name+'_'+st.mode+'.jpg'); swapSrc(v2d,'web_media/qual/'+d.name+'_'+st.mode+'.mp4',t); }
+  else { v2d.pause(); v2d.style.display='none'; g3d.style.display='grid';
+    vreal.setAttribute('poster','web_media/qual/'+d.name+'_real.jpg'); swapSrc(vreal,'web_media/qual/'+d.name+'_real.mp4',t); load3d(d.name); }
+}
+function choose(i){ if(i===st.i) return; st.i=i; cam=null; show(0); }
+document.querySelectorAll('.qobj').forEach(b=>b.addEventListener('click',()=>choose(+b.dataset.i)));
+document.querySelectorAll('[data-rate]').forEach(b=>b.addEventListener('click',()=>{st.rate=+b.dataset.rate; v2d.playbackRate=st.rate; vreal.playbackRate=st.rate; show();}));
+document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>{st.mode=b.dataset.mode; show();}));
+document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>{st.view=b.dataset.view; show();}));
+[v2d, vreal].forEach(v=>v.addEventListener('play',()=>{v.playbackRate=st.rate;}));
+
+// ------------------------------------------------------------ 3D view: the deforming display meshes (WebGL, one orbit camera for all panels)
+const meshes={}; let cam=null;
+function load3d(name){
+  if(meshes[name]) return; if(window.PRM && window.PRM[name]){ decode(name); return; }
+  if(meshes[name+'_loading']) return; meshes[name+'_loading']=true;
+  const s=document.createElement('script'); s.src='web_media/qual/'+name+'_mesh.js'; s.onload=()=>decode(name); document.head.appendChild(s);
+}
+function decode(name){
+  if(meshes[name]) return; const r=window.PRM[name], bin=atob(r.data), u=new Uint8Array(bin.length);
+  for(let k=0;k<bin.length;k++) u[k]=bin.charCodeAt(k);
+  const m=r.meta, buf=u.buffer, out={meta:m, faces:new Uint16Array(buf,m.faces,m.nf*3), col:new Uint8Array(buf,m.colors,m.nv*3), runs:{}};
+  for(const s of S){ const q=m.runs[s[0]], nfr=q.frames.length;
+    out.runs[s[0]]={start:q.start, T:q.T, frames:q.frames, head:new Float32Array(buf,q.head,nfr*4), pos:new Int16Array(buf,q.pos,nfr*m.nv*3), str:new Uint8Array(buf,q.strain,nfr*m.nv)}; }
+  const rr=out.runs[S[0][0]], nf=rr.frames.length; let t=[0,0,0]; for(let j=0;j<nf;j++){t[0]+=rr.head[4*j]/nf; t[1]+=rr.head[4*j+1]/nf; t[2]+=rr.head[4*j+2]/nf;}
+  out.tgt=t;   // view centre: the reference object's mean position over the drop (release to rest)
+  meshes[name]=out; window.PRM[name]=null;
+}
+function initCam(o){
+  const m=o.meta, p=m.camera, tg=o.tgt, v=[p[0]-tg[0],p[1]-tg[1],p[2]-tg[2]], L=Math.hypot(...v), fov=35*Math.PI/180;
+  return {yaw:Math.atan2(v[0],v[2]), pitch:Math.asin(Math.max(-0.95,Math.min(0.95,v[1]/L))), dist:3.2*m.radius/Math.tan(fov/2), fov:fov, tg:tg.slice()};
+}
+// small matrix helpers (column-major)
+function persp(f,a,n,fa){const t=1/Math.tan(f/2);return [t/a,0,0,0, 0,t,0,0, 0,0,(fa+n)/(n-fa),-1, 0,0,2*fa*n/(n-fa),0];}
+function lookAt(e,c){let z=[e[0]-c[0],e[1]-c[1],e[2]-c[2]];let n=Math.hypot(...z);z=z.map(x=>x/n);let x=[z[2],0,-z[0]];n=Math.hypot(...x)||1;x=x.map(q=>q/n);
+  const y=[z[1]*x[2]-z[2]*x[1], z[2]*x[0]-z[0]*x[2], z[0]*x[1]-z[1]*x[0]];
+  return [x[0],y[0],z[0],0, x[1],y[1],z[1],0, x[2],y[2],z[2],0, -(x[0]*e[0]+x[1]*e[1]+x[2]*e[2]), -(y[0]*e[0]+y[1]*e[1]+y[2]*e[2]), -(z[0]*e[0]+z[1]*e[1]+z[2]*e[2]), 1];}
+function mul(a,b){const r=new Array(16);for(let i=0;i<4;i++)for(let j=0;j<4;j++){let s=0;for(let k=0;k<4;k++)s+=a[k*4+j]*b[i*4+k];r[i*4+j]=s;}return r;}
+const VS='attribute vec3 p;attribute vec3 n;attribute vec3 c;uniform mat4 M;uniform float lit;varying vec3 vc;void main(){gl_Position=M*vec4(p,1.0);'+
+  'vec3 L=normalize(vec3(0.35,0.85,0.45));float d=abs(dot(normalize(n),L));vc=c*mix(1.0,0.42+0.58*d,lit);}';
+const FS='precision mediump float;varying vec3 vc;void main(){gl_FragColor=vec4(vc,1.0);}';
+const GL=canv.map(cv=>{ const gl=cv.getContext('webgl',{antialias:true}); if(!gl) return null;
+  const sh=(t,src)=>{const s=gl.createShader(t);gl.shaderSource(s,src);gl.compileShader(s);return s;};
+  const pr=gl.createProgram(); gl.attachShader(pr,sh(gl.VERTEX_SHADER,VS)); gl.attachShader(pr,sh(gl.FRAGMENT_SHADER,FS)); gl.linkProgram(pr); gl.useProgram(pr);
+  return {gl, pr, ap:gl.getAttribLocation(pr,'p'), an:gl.getAttribLocation(pr,'n'), ac:gl.getAttribLocation(pr,'c'), uM:gl.getUniformLocation(pr,'M'), uL:gl.getUniformLocation(pr,'lit'),
+          bp:gl.createBuffer(), bn:gl.createBuffer(), bc:gl.createBuffer(), bi:gl.createBuffer(), bg:gl.createBuffer(), bgc:gl.createBuffer(), bgn:gl.createBuffer(), key:null}; });
+function attrib(g, buf, loc, data){ const gl=g.gl; gl.bindBuffer(gl.ARRAY_BUFFER, buf); if(data) gl.bufferData(gl.ARRAY_BUFFER, data, gl.DYNAMIC_DRAW); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc,3,gl.FLOAT,false,0,0); }
+function frameData(o, run, frame){
+  const m=o.meta, r=o.runs[run], nv=m.nv, loc=Math.max(0,Math.min(r.T-1,frame-r.start)); let j=r.frames.indexOf(loc); if(j<0) j=Math.min(r.frames.length-1, Math.round(loc/m.step));
+  const h=r.head, c0=h[4*j], c1=h[4*j+1], c2=h[4*j+2], sc=h[4*j+3], P=new Float32Array(nv*3), N=new Float32Array(nv*3), C=new Float32Array(nv*3);
+  for(let k=0;k<nv;k++){ const q=3*(j*nv+k); P[3*k]=c0+r.pos[q]*sc; P[3*k+1]=c1+r.pos[q+1]*sc; P[3*k+2]=c2+r.pos[q+2]*sc; }
+  const F=o.faces; for(let f=0;f<F.length;f+=3){ const a=3*F[f], b=3*F[f+1], c=3*F[f+2];
+    const ux=P[b]-P[a], uy=P[b+1]-P[a+1], uz=P[b+2]-P[a+2], vx=P[c]-P[a], vy=P[c+1]-P[a+1], vz=P[c+2]-P[a+2];
+    const nx=uy*vz-uz*vy, ny=uz*vx-ux*vz, nz=ux*vy-uy*vx; for(const i of [a,b,c]){N[i]+=nx;N[i+1]+=ny;N[i+2]+=nz;} }
+  for(let k=0;k<nv;k++){ let cr=o.col[3*k]/255, cg=o.col[3*k+1]/255, cb=o.col[3*k+2]/255;
+    if(st.mode==='strain'){ const v=r.str[j*nv+k]; if(v!==255){ const t=v/254, a=Math.min(t/0.22,1)*0.9, L=LUT[Math.min(255,Math.round(t*255))];
+      cr=cr*(1-a)+L[0]/255*a; cg=cg*(1-a)+L[1]/255*a; cb=cb*(1-a)+L[2]/255*a; } }
+    C[3*k]=cr; C[3*k+1]=cg; C[3*k+2]=cb; }
+  return {P,N,C};
+}
+function floorGrid(o){
+  const m=o.meta, tg=m.target, y=m.floor-0.002, ext=Math.max(0.4, Math.ceil(m.radius*6*10)/10), L=[];
+  for(let a=-ext;a<=ext+1e-9;a+=0.05){ L.push(tg[0]+a,y,tg[2]-ext, tg[0]+a,y,tg[2]+ext, tg[0]-ext,y,tg[2]+a, tg[0]+ext,y,tg[2]+a); }
+  const P=new Float32Array(L), C=new Float32Array(L.length).fill(0.82), N=new Float32Array(L.length); for(let k=1;k<N.length;k+=3) N[k]=1; return {P,C,N};
+}
+function draw(k, o, frame){
+  const g=GL[k]; if(!g) return; const gl=g.gl, cv=canv[k], dpr=window.devicePixelRatio||1, W=Math.max(1,Math.round(cv.clientWidth*dpr)), H=Math.max(1,Math.round(cv.clientHeight*dpr));
+  if(cv.width!==W||cv.height!==H){cv.width=W;cv.height=H;}
+  gl.viewport(0,0,W,H); gl.clearColor(0.957,0.961,0.965,1); gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT); gl.enable(gl.DEPTH_TEST);
+  const e=[cam.tg[0]+cam.dist*Math.cos(cam.pitch)*Math.sin(cam.yaw), cam.tg[1]+cam.dist*Math.sin(cam.pitch), cam.tg[2]+cam.dist*Math.cos(cam.pitch)*Math.cos(cam.yaw)];
+  gl.uniformMatrix4fv(g.uM,false,new Float32Array(mul(persp(cam.fov,W/H,0.01,50),lookAt(e,cam.tg))));
+  if(g.key!==o.meta.key){ g.key=o.meta.key; gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,g.bi); gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,o.faces,gl.STATIC_DRAW);
+    const fg=floorGrid(o); g.ng=fg.P.length/3; gl.bindBuffer(gl.ARRAY_BUFFER,g.bg); gl.bufferData(gl.ARRAY_BUFFER,fg.P,gl.STATIC_DRAW);
+    gl.bindBuffer(gl.ARRAY_BUFFER,g.bgc); gl.bufferData(gl.ARRAY_BUFFER,fg.C,gl.STATIC_DRAW); gl.bindBuffer(gl.ARRAY_BUFFER,g.bgn); gl.bufferData(gl.ARRAY_BUFFER,fg.N,gl.STATIC_DRAW); }
+  gl.uniform1f(g.uL,0.0); attrib(g,g.bg,g.ap,null); attrib(g,g.bgn,g.an,null); attrib(g,g.bgc,g.ac,null); gl.drawArrays(gl.LINES,0,g.ng);
+  const fd=frameData(o,S[k][0],frame); gl.uniform1f(g.uL,1.0); attrib(g,g.bp,g.ap,fd.P); attrib(g,g.bn,g.an,fd.N); attrib(g,g.bc,g.ac,fd.C);
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,g.bi); gl.drawElements(gl.TRIANGLES,o.faces.length,gl.UNSIGNED_SHORT,0);
+}
+function loop(){
+  if(st.view==='3d'){ const o=meshes[D[st.i].name]; if(o && o.meta){ if(!cam) cam=initCam(o);
+    const frame=Math.min(59, Math.floor((vreal.currentTime||0)*30+1e-6)); for(let k=0;k<canv.length;k++) draw(k,o,frame); } }
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+document.getElementById('reset').addEventListener('click',()=>{cam=null;});
+const ptr=new Map(); let pinch0=0, dist0=1;
+canv.forEach(cv=>{
+  cv.addEventListener('pointerdown',e=>{cv.setPointerCapture(e.pointerId); ptr.set(e.pointerId,[e.clientX,e.clientY]);
+    if(ptr.size===2&&cam){const [a,b]=[...ptr.values()]; pinch0=Math.hypot(a[0]-b[0],a[1]-b[1]); dist0=cam.dist;} });
+  cv.addEventListener('pointermove',e=>{ if(!ptr.has(e.pointerId)||!cam) return; const p=ptr.get(e.pointerId);
+    if(ptr.size===1){ cam.yaw-=(e.clientX-p[0])*0.008; cam.pitch=Math.max(-1.45,Math.min(1.45,cam.pitch+(e.clientY-p[1])*0.008)); }
+    ptr.set(e.pointerId,[e.clientX,e.clientY]);
+    if(ptr.size===2){ const [a,b]=[...ptr.values()]; const d=Math.hypot(a[0]-b[0],a[1]-b[1]); if(pinch0>0) cam.dist=Math.max(0.05,dist0*pinch0/d); } });
+  const up=e=>{ptr.delete(e.pointerId); if(ptr.size<2) pinch0=0;};
+  cv.addEventListener('pointerup',up); cv.addEventListener('pointercancel',up);
+  cv.addEventListener('wheel',e=>{ if(!cam) return; e.preventDefault(); cam.dist=Math.max(0.05,cam.dist*Math.exp(e.deltaY*0.0012)); },{passive:false});
+  cv.addEventListener('dblclick',()=>{cam=null;});
+});
+show();
+
+// ------------------------------------------------------------ tooltips shared by the two scatter plots
+function tipOn(wrapId, tipId, html, e){ const tip=document.getElementById(tipId), box=document.getElementById(wrapId).getBoundingClientRect();
+  tip.innerHTML=html; tip.style.display='block'; const x=e.clientX-box.left+14; tip.style.left=Math.min(x, box.width-tip.offsetWidth-4)+'px'; tip.style.top=(e.clientY-box.top+10)+'px'; }
+function tipOff(tipId){ document.getElementById(tipId).style.display='none'; }
+const FONT='font-family="Times New Roman, Termes, serif"';
+
+// ------------------------------------------------------------ which inputs transfer: main Fig. 4 (left)
+const F4=window.FIG4; let f4rings=false;
+function f4draw(){
+  const W=860, H=520, L=70, R=24, T=20, Bm=56, x0=0.39, x1=0.79, y0=0.65, y1=1.45, xs=v=>L+(v-x0)/(x1-x0)*(W-L-R), ys=v=>T+(y1-v)/(y1-y0)*(H-T-Bm);
+  let g='<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" '+FONT+' font-size="17">';
+  for(let v=0.45; v<0.79; v+=0.1) g+='<line x1="'+xs(v)+'" x2="'+xs(v)+'" y1="'+T+'" y2="'+(H-Bm)+'" stroke="#eee"/><text x="'+xs(v)+'" y="'+(H-Bm+22)+'" text-anchor="middle" fill="#555">'+v.toFixed(2)+'</text>';
+  for(let v=0.8; v<1.45; v+=0.2) g+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+ys(v)+'" y2="'+ys(v)+'" stroke="#eee"/><text x="'+(L-8)+'" y="'+(ys(v)+5)+'" text-anchor="end" fill="#555">'+v.toFixed(1)+'</text>';
+  g+='<text x="'+((L+W-R)/2)+'" y="'+(H-12)+'" text-anchor="middle">Stiffness error in simulation (dex)</text><text transform="translate(20,'+((T+H-Bm)/2)+') rotate(-90)" text-anchor="middle">Stiffness error on real drops (dex)</text>';
+  g+='<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#7b8591"/></marker></defs>';
+  F4.arrows.forEach(([a,b])=>{ const p=F4.pts[a], q=F4.pts[b]; g+='<line x1="'+xs(p.syn)+'" y1="'+ys(p.real)+'" x2="'+xs(q.syn)+'" y2="'+ys(q.real)+'" stroke="#7b8591" stroke-width="1.5" marker-end="url(#ah)" opacity="'+(f4rings?0.35:0.9)+'"/>'; });
+  Object.entries(F4.pts).forEach(([k,p])=>{ if(p.ring&&!f4rings) return; const dim=f4rings&&!p.ring&&k!=='rgb3d', x=xs(p.syn), y=ys(p.real);
+    g+='<g class="pt" data-k="'+k+'" opacity="'+(dim?0.3:1)+'">';
+    g+=p.ring?'<circle cx="'+x+'" cy="'+y+'" r="7" fill="#fff" stroke="'+p.color+'" stroke-width="2.2"/>':(p.star?'<text x="'+x+'" y="'+(y+8)+'" text-anchor="middle" font-size="26" fill="'+p.color+'">&#9733;</text>':'<circle cx="'+x+'" cy="'+y+'" r="7" fill="'+p.color+'"/>');
+    if(!p.ring) g+='<text x="'+(x+p.dx)+'" y="'+(y+p.dy)+'" text-anchor="'+p.anchor+'" fill="'+p.color+'"'+(p.star?' font-weight="700"':'')+'>'+p.short+'</text>';
+    g+='<circle cx="'+x+'" cy="'+y+'" r="14" fill="transparent"/></g>'; });
+  document.getElementById('f4plot').innerHTML=g+'</svg>';
+  document.querySelectorAll('#f4plot .pt').forEach(el=>{ const p=F4.pts[el.dataset.k];
+    const h='<b>'+p.name+'</b><br>error in simulation '+p.syn.toFixed(3)+' dex<br>error on real drops '+p.real.toFixed(3)+' dex';
+    el.addEventListener('mousemove',e=>tipOn('f4wrap','f4tip',h,e)); el.addEventListener('mouseleave',()=>tipOff('f4tip')); el.addEventListener('click',e=>tipOn('f4wrap','f4tip',h,e)); });
+}
+document.getElementById('f4rings').addEventListener('change',e=>{f4rings=e.target.checked; f4draw();});
+f4draw();
+
+// ------------------------------------------------------------ comparison with prior methods: main Table 5 (time per video against parameter distance)
+const T5=window.TAB5;
+(function t5draw(){
+  const W=860, H=500, L=70, R=24, T=16, Bm=56, x0=-1.15, x1=5.15, y0=0.5, y1=2.08, xs=v=>L+(v-x0)/(x1-x0)*(W-L-R), ys=v=>T+(y1-v)/(y1-y0)*(H-T-Bm);
+  const lx=p=>Math.log10(p.minutes*60);
+  let g='<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" '+FONT+' font-size="17">';
+  g+='<rect x="'+xs(x0)+'" y="'+T+'" width="'+(xs(Math.log10(60))-xs(x0))+'" height="'+(H-T-Bm)+'" fill="#f1f6fc"/><text x="'+(xs(x0)+8)+'" y="'+(T+18)+'" fill="#6f8fb5" font-size="15">under 1 min per video</text>';
+  [[0.1,'0.1 s'],[1,'1 s'],[10,'10 s'],[60,'1 min'],[600,'10 min'],[3600,'1 h'],[10800,'3 h']].forEach(([s,l])=>{ const x=xs(Math.log10(s));
+    g+='<line x1="'+x+'" x2="'+x+'" y1="'+T+'" y2="'+(H-Bm)+'" stroke="#eee"/><text x="'+x+'" y="'+(H-Bm+22)+'" text-anchor="middle" fill="#555">'+l+'</text>'; });
+  for(let v=0.6; v<2.05; v+=0.2) g+='<text x="'+(L-8)+'" y="'+(ys(v)+5)+'" text-anchor="end" fill="#555">'+v.toFixed(1)+'</text>';
+  g+='<text x="'+((L+W-R)/2)+'" y="'+(H-12)+'" text-anchor="middle">Time per video (log scale)</text><text transform="translate(20,'+((T+H-Bm)/2)+') rotate(-90)" text-anchor="middle">Parameter distance (dex)</text>';
+  g+='<defs><marker id="ah2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#7b5fb5"/></marker></defs>';
+  const by={}; T5.pts.forEach(p=>by[p.label]=p);
+  T5.arrows.forEach(([a,b])=>{ const p=by[a], q=by[b], X0=xs(lx(p)), Y0=ys(p.dist), X1=xs(lx(q)), Y1=ys(q.dist), d=Math.hypot(X1-X0,Y1-Y0), s=13/d;
+    g+='<line x1="'+(X0+(X1-X0)*s)+'" y1="'+(Y0+(Y1-Y0)*s)+'" x2="'+(X1-(X1-X0)*s)+'" y2="'+(Y1-(Y1-Y0)*s)+'" stroke="#7b5fb5" stroke-width="1.6" opacity=".6" marker-end="url(#ah2)"/>'; });
+  T5.pts.forEach((p,k)=>{ const x=xs(lx(p)), y=ys(p.dist);
+    g+='<g class="pt5" data-k="'+k+'">'+(p.ours?'<text x="'+x+'" y="'+(y+9)+'" text-anchor="middle" font-size="28" fill="'+p.color+'">&#9733;</text>':'<circle cx="'+x+'" cy="'+y+'" r="7" fill="'+p.color+'"/>')+
+       '<circle cx="'+x+'" cy="'+y+'" r="14" fill="transparent"/></g>'; });
+  T5.families.forEach(([c,n],j)=>{ g+='<text x="'+(W-R-6)+'" y="'+(T+20+20*j)+'" text-anchor="end" fill="'+c+'" font-size="16">'+n+'</text>'; });
+  document.getElementById('t5plot').innerHTML=g+'</svg>';
+  document.querySelectorAll('#t5plot .pt5').forEach(el=>{ const p=T5.pts[+el.dataset.k], t=p.minutes<1?(p.minutes*60).toFixed(p.minutes*60<1?2:1)+' s':p.minutes.toFixed(1)+' min';
+    const h='<b>'+p.name+'</b><br>'+p.family+'<br>parameter distance '+p.dist.toFixed(3)+' dex<br>time per video '+t;
+    el.addEventListener('mousemove',e=>tipOn('t5wrap','t5tip',h,e)); el.addEventListener('mouseleave',()=>tipOff('t5tip')); el.addEventListener('click',e=>tipOn('t5wrap','t5tip',h,e)); });
+})();
+</script>
+</body></html>
