@@ -133,7 +133,7 @@ For evaluation, the prediction re-simulates the drop with density <i>&rho;</i> a
 <h3>Findings</h3>
 <ul class="find"><li>In simulation, the best input is the one with the most 3D information. On real drops, sim-to-real transferability also matters. It is a trade-off between informativeness and transferability: the best input should transfer well while still having enough geometric&nbsp;information.</li><li>Estimated 2D tracklets transfer to real drops. Lifted 3D tracklets do not, and better depth does not fix&nbsp;this.</li><li>Physics happens in 3D, and we can still use 3D deformation. PhysReader keeps the 2D tracklets as input and learns the lift to 3D in simulation, by matching a teacher that sees the exact 3D&nbsp;deformation.</li><li>To choose an input, do not test it on synthetic data, but on real drops or re-simulated real&nbsp;scenes.</li></ul>
 <h3>BibTeX</h3>
-<pre class="bib">@article{peng2026drop,
+<pre class="bib">@article{peng2026physreader,
   title   = {What a Drop Reveals: Sim-to-Real Material Estimation for Deformable Objects from Video},
   author  = {Ziyue Peng and Yanxi Hu and Junyoung Kim and Andrew Chen and Jin Yang and Chandrajit L. Bajaj and Etienne Vouga and William T. Freeman and Qixing Huang and Brandon Y. Feng},
   journal = {arXiv preprint arXiv:2611.34894},
