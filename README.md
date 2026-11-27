@@ -132,21 +132,25 @@ be re-run exactly: their particle volumes could not be recovered, marked by `abs
 
 - The released clips are the ones we trained on, but the rendering cannot be regenerated: the mesh scale, texture
   and particle sampling seeds were not recorded. We release the videos instead.
-- For 28 of the 80 real drops the model input window starts one or two frames away from C−3 (C is the first
-  contact frame), as in the paper. `drops.json` lists both the window and the input frames.
+- For 28 of the 80 real drops the model input is shifted from C−3..C+12 by one frame (by two for pillow drop 2).
+  The input windows were fixed early from a first annotation of the contact frame C, and every model in the paper
+  was evaluated on them; the simulation, the reference fit and the replay use the final, hand-picked C.
+  `drops.json` lists both: `window` is C−3..C+12 and `input_frames` are the frames the models see.
 - Replays are not bitwise reproducible. GPU atomic sums move particles by a few µm from run to run (0.1 mm for
   the stiffest objects), and the deformation terms, computed from optical flow on the rendered video, amplify
   this: re-running one trial changes its total loss by about 1%, its deformation loss by several percent, more
   for objects with few flow tracklets (belt) or very stiff ones (box). The original code behaves the same.
   Err_ref reproduces the paper to 1e-6; for the stiffest drops it changes by a few 1e-3 from run to run.
-- The replay columns of the nine direct models in Table 1 come, for 43–46 of the 80 drops each, from an earlier
-  60-frame version of the replay; this code implements the 16-frame protocol used for PhysReader, both students
-  and the references. Re-running those rows gives slightly different numbers.
+- For seven rows of Table 1 (RGB, RGB + dense flow, RGB + depth, 2D tracklets only, RGB + 2D tracklets,
+  RGB + 2D tracklets + cues, RGB + 3D tracklets), the replay columns take 43–46 of the 80 drops from an earlier
+  version of the replay that simulated 60 frames and weighted the loss terms differently. This code implements the
+  16-frame protocol used for the other drops, for both students and for the references, so re-running those rows
+  gives somewhat different replay numbers. Their parameter distances are not affected.
 
 ## Citation
 
 ```bibtex
-@article{peng2026drop,
+@article{peng2026physreader,
   title   = {What a Drop Reveals: Sim-to-Real Material Estimation for Deformable Objects from Video},
   author  = {Ziyue Peng and Yanxi Hu and Junyoung Kim and Andrew Chen and Jin Yang and Chandrajit L. Bajaj and Etienne Vouga and William T. Freeman and Qixing Huang and Brandon Y. Feng},
   journal = {arXiv preprint arXiv:2611.34894},
