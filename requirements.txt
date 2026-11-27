@@ -1,0 +1,7 @@
+torch==2.7.1
+transformers==4.56.1
+numpy==1.26.4
+scipy>=1.11
+opencv-python-headless==4.10.0.84
+warp-lang==0.10.1
+huggingface_hub>=0.34
