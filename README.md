@@ -132,10 +132,6 @@ be re-run exactly: their particle volumes could not be recovered, marked by `abs
 
 - The released clips are the ones we trained on, but the rendering cannot be regenerated: the mesh scale, texture
   and particle sampling seeds were not recorded. We release the videos instead.
-- For 28 of the 80 real drops the model input is shifted from C−3..C+12 by one frame (by two for pillow drop 2).
-  The input windows were fixed early from a first annotation of the contact frame C, and every model in the paper
-  was evaluated on them; the simulation, the reference fit and the replay use the final, hand-picked C.
-  `drops.json` lists both: `window` is C−3..C+12 and `input_frames` are the frames the models see.
 - Replays are not bitwise reproducible. GPU atomic sums move particles by a few µm from run to run (0.1 mm for
   the stiffest objects), and the deformation terms, computed from optical flow on the rendered video, amplify
   this: re-running one trial changes its total loss by about 1%, its deformation loss by several percent, more
