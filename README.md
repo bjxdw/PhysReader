@@ -75,7 +75,7 @@ total and Δ deformation, in percent). It also reports Err_ref: the material sim
 state and compared particle by particle with the reference simulation. `--drops box_1 ...` selects drops,
 `--skip-replay` computes Err_ref only, and `--reference --fixed` replays the reference materials at their selected
 initial states. For PhysReader the paper reports Δ deformation 12.32%, Δ total 10.15% and Err_ref 0.1072; a re-run
-lands within about one point of the Δ values (see below). Results are written per drop, so an interrupted run
+lands within about one point of the Δ values (see the note below). Results are written per drop, so an interrupted run
 resumes. On one A100 a drop takes about 4 minutes for a soft material and up to 40 for the stiffest; PhysReader's
 80 drops take about 8 hours.
 The replay also needs PyTorch3D 0.7.9, trimesh 4.4 with embreex, scikit-learn and imageio-ffmpeg.
@@ -128,20 +128,13 @@ reproducible from run to run; the original code behaves the same. 70 of the 97,2
 be re-run exactly: their particle volumes could not be recovered, marked by `abs(mass_check - 1) > 1e-3` in
 `simulations.json`.
 
-## Differences from the paper
+## Note
 
-- The released clips are the ones we trained on, but the rendering cannot be regenerated: the mesh scale, texture
-  and particle sampling seeds were not recorded. We release the videos instead.
-- Replays are not bitwise reproducible. GPU atomic sums move particles by a few µm from run to run (0.1 mm for
-  the stiffest objects), and the deformation terms, computed from optical flow on the rendered video, amplify
-  this: re-running one trial changes its total loss by about 1%, its deformation loss by several percent, more
-  for objects with few flow tracklets (belt) or very stiff ones (box). The original code behaves the same.
-  Err_ref reproduces the paper to 1e-6; for the stiffest drops it changes by a few 1e-3 from run to run.
-- For seven rows of Table 1 (RGB, RGB + dense flow, RGB + depth, 2D tracklets only, RGB + 2D tracklets,
-  RGB + 2D tracklets + cues, RGB + 3D tracklets), the replay columns take 43–46 of the 80 drops from an earlier
-  version of the replay that simulated 60 frames and weighted the loss terms differently. This code implements the
-  16-frame protocol used for the other drops, for both students and for the references, so re-running those rows
-  gives somewhat different replay numbers. Their parameter distances are not affected.
+Replays are not bitwise reproducible. GPU atomic sums move particles by a few µm from run to run (0.1 mm for the
+stiffest objects), and the deformation terms, computed from optical flow on the rendered video, amplify this:
+re-running one trial changes its total loss by about 1%, its deformation loss by several percent, more for objects
+with few flow tracklets (belt) or very stiff ones (box). The original code behaves the same. Err_ref reproduces the
+paper to 1e-6; for the stiffest drops it changes by a few 1e-3 from run to run.
 
 ## Citation
 
